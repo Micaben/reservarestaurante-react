@@ -38,7 +38,7 @@ npm start
 
 Luego abrir el navegador en:
 
-http://localhost:5173
+http://localhost:3000
 
 ## Funcionalidades
 
