@@ -1,3 +1,67 @@
+# Sistema de Reservas - Restaurante
+
+Aplicación web desarrollada con React que permite gestionar reservas de mesas en un restaurante.
+
+## Tecnologías utilizadas
+
+- React
+- React Router
+- Bootstrap
+- SweetAlert2
+
+## Requisitos del sistema
+
+Antes de ejecutar el proyecto se debe tener instalado:
+
+- Node.js
+- npm
+
+## Instalación del proyecto
+
+1. Clonar el repositorio:
+
+git clone https://github.com/Micaben/reservarestaurante-react
+
+2. Ingresar a la carpeta del proyecto:
+
+cd reservarestaurante-react
+
+3. Instalar dependencias:
+
+npm install
+
+## Ejecutar la aplicación
+
+Para iniciar el servidor de desarrollo ejecutar:
+
+npm start
+
+Luego abrir el navegador en:
+
+http://localhost:5173
+
+## Funcionalidades
+
+- Registro de reservas
+- Validación de datos de usuario
+- Elecccion de mesas y hora
+- Resumen de la reserva generada
+- Confirmacion de reserva por medio de un cobro por la reserva  
+- Confirmación con SweetAlert
+- Guarda datos con LocalStorage
+- Pagina login para uso administrativo
+- Detalle de la reserva por dia
+- Modificar o eliminar reserva del dia
+- Exportar la lista de reserva en un archivo excel
+
+## Pruebas
+
+1. Crear una nueva reserva.
+2. Validar que no se puedan duplicar fecha, hora y mesa.
+3. Verificar que el resumen de reserva se muestre correctamente.
+4. Guardar reserva
+5. Verificar la reserva en el dashoboard del administrador
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
