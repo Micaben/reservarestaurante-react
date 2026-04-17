@@ -5,7 +5,8 @@ export const alertaError = (mensaje) => {
     icon: "error",
     title: "Error",
     text: mensaje,
-    confirmButtonColor: "#b30000"
+    confirmButtonColor: "#b30000",
+     target: document.body
   });
 };
 

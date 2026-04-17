@@ -16,7 +16,11 @@ export const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Sin validaciones
+    localStorage.setItem("auth", "true");
+    localStorage.setItem("usuario", form.usuario);
+
+    window.dispatchEvent(new Event("authChange"));
+
     navigate("/dashboard");
   };
 

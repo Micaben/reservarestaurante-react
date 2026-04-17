@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { alertaOk } from "../utils/alerts";
 import { alertaError } from "../utils/alerts";
+import { ReservasForm } from "../Components/ReservasForm";
 
-export const Reservas = () => {
+export const Reservas = ({ mesas, setMesas, horarios   }) => {
     const [mostrarResumen, setMostrarResumen] = useState(false);
-    const [mostrarPago, setMostrarPago] = useState(false);
-    
+    const [mostrarPago] = useState(false);
     // Valores por defecto
     const fechaActual = new Date().toLocaleDateString('sv-SE');
     const cerrarModal = () => {
@@ -14,6 +14,7 @@ export const Reservas = () => {
         document.body.style.overflow = "auto";
     };
 
+    
     // Reservas = ARRAY
     const [reservas, setReservas] = useState(() => {
         const data = localStorage.getItem("reservas");
@@ -32,6 +33,23 @@ export const Reservas = () => {
         mesa: ""
     });
 
+    //validar hora 
+    const HoraPasada = (horaStr) => {
+        const ahora = new Date();
+        let [hora, minuto] = horaStr.split(" ")[0].split(":");
+        let periodo = horaStr.split(" ")[1];
+
+        hora = parseInt(hora);
+
+        if (periodo === "PM" && hora !== 12) hora += 12;
+        if (periodo === "AM" && hora === 12) hora = 0;
+
+        const fechaHora = new Date();
+        fechaHora.setHours(hora, parseInt(minuto), 0);
+
+        return fechaHora < ahora;
+    };
+
     useEffect(() => {
         if (mostrarResumen || mostrarPago) {
             document.body.style.overflow = "hidden";
@@ -43,6 +61,7 @@ export const Reservas = () => {
             document.body.style.overflow = "auto";
         };
     }, [mostrarResumen, mostrarPago]);
+
 
     // Guardar reservas
     useEffect(() => {
@@ -100,22 +119,19 @@ export const Reservas = () => {
         });
     };
 
-    const HORAS = [
-        "09:00", "10:00", "11:00", "12:00",
-        "13:00", "14:00", "15:00", "16:00",
-        "17:00", "18:00", "19:00", "20:00",
-        "21:00", "22:00"
-    ];
-    const MESAS = [
-        { id: 1, capacidad: 2 },
-        { id: 2, capacidad: 4 },
-        { id: 3, capacidad: 4 },
-        { id: 4, capacidad: 6 },
-        { id: 5, capacidad: 8 },
-        { id: 6, capacidad: 2 },
-        { id: 7, capacidad: 4 },
-        { id: 8, capacidad: 6 }
-    ];
+    const mesasOcupadas = reservas
+        .filter(r => r.fecha === form.fecha && r.hora === form.hora)
+        .map(r => Number(r.mesa));
+
+    const mesasConEstado = mesas.map(mesa => {
+        const ocupada = mesasOcupadas.includes(mesa.id);
+
+        return {
+            ...mesa,
+            ocupada,
+            disponible: mesa.habilitada && !ocupada
+        };
+    });
 
     const seleccionarHora = hora => {
         setForm({ ...form, hora });
@@ -136,104 +152,24 @@ export const Reservas = () => {
         )
         .map(r => r.hora);
 
-    const mesasOcupadas = reservas
-        .filter(r => r.fecha === form.fecha && r.hora === form.hora)
-        .map(r => Number(r.mesa));
-
     return (
         <section className="reservas-container">
 
             <h1>Gestión de Reservas</h1>
             {/* FORMULARIO */}
-            <form className="reserva-form" onSubmit={handleSubmit}>
-                <div className="row">
-                    <div className="col-lg-6 mb-3">
-                        <label htmlFor="nombres">Nombres</label>
-                        <input className="form-control" type="text" name="nombre"
-                            value={form.nombre} onChange={handleChange} required />
-                    </div>
-                    <div className="col-lg-6 mb-3">
-                        <label htmlFor="apellidos" >Apellidos</label>
-                        <input className="form-control" type="text" name="apellidos"
-                            value={form.apellidos} onChange={handleChange} required />
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-lg-6 mb-3">
-                        <label htmlFor="correo" >Correo</label>
-                        <input className="form-control" type="email" name="correo"
-                            value={form.correo} onChange={handleChange} required />
-                    </div>
-                    <div className="col-lg-6 mb-3">
-                        <label >Telefono</label>
-                        <input className="form-control" name="telefono"
-                            value={form.telefono} onChange={handleChange} required />
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col-lg-6 mb-3">
-                        <label htmlFor="fecha" >Fecha de reserva</label>
-                        <input className="form-control" type="date" name="fecha"
-                            value={form.fecha} onChange={handleChange} required />
-                    </div>
-                    <div className="col-lg-6 mb-3">
-                        <label htmlFor="personas" >Numero de personas</label>
-
-                        <input className="form-control" type="number" name="personas"
-                            value={form.personas} min="1"
-                            onChange={handleChange} required />
-                    </div>
-                </div>
-                {/* MESAS */}
-                <h4>Seleccionar Mesa</h4>
-                <div className="mesas-grid">
-                    {MESAS.map(m => {
-
-                        const ocupada = mesasOcupadas.includes(m.id);
-                        return (
-                            <div
-                                key={m.id}
-                                className={`mesa ${ocupada ? "ocupada" : ""} ${form.mesa == m.id ? "selected" : ""}`}
-                                onClick={() => !ocupada && seleccionarMesa(m.id)}
-                            >
-                                <strong>Mesa {m.id}</strong>
-                                <p>{m.capacidad} personas</p>
-                            </div>
-                        );
-                    })}
-
-                </div>
-                <h4>Seleccionar Hora</h4>
-                <div className="horas-grid">
-                    {!form.mesa && (
-                        <p>Primero selecciona una mesa</p>
-                    )}
-
-                    {HORAS.map(h => {
-                        const ocupada = horasOcupadas.includes(h);
-                        const deshabilitada = !form.mesa;
-
-                        return (
-                            <div
-                                key={h}
-                                className={`hora 
-                                ${ocupada ? "ocupada" : ""} 
-                                ${form.hora === h ? "selected" : ""}
-                                ${deshabilitada ? "disabled" : ""}
-                                `}
-                                onClick={() => {
-                                    if (!ocupada && form.mesa) {
-                                        seleccionarHora(h)
-                                    }
-                                }}
-                            >
-                                {h}
-                            </div>
-                        );
-                    })}
-                </div>
-                <button type="submit">Guardar Reserva</button>
-            </form>
+            <ReservasForm
+                form={form}
+                handleChange={handleChange}
+                handleSubmit={handleSubmit}
+                seleccionarMesa={seleccionarMesa}
+                seleccionarHora={seleccionarHora}
+                mesas={mesasConEstado}
+                mesasOcupadas={mesasOcupadas}
+                horasOcupadas={horasOcupadas}
+                fechaActual={fechaActual}
+                HoraPasada={HoraPasada}
+                horarios={horarios}
+            />
             {
                 mostrarResumen && createPortal(
                     <div className="modal-overlay">
